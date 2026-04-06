@@ -84,7 +84,7 @@ def upload():
                     except UnicodeDecodeError:
                         pass
                     else:
-                        if uf.human_name and uf.human_name.endswith('.md'):
+                        if uf.human_name and uf.human_name.lower().endswith('.md'):
                             pb = ctx.enter_context(
                                 HtmlToStore.from_html(
                                     render_template(
