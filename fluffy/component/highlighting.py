@@ -55,10 +55,12 @@ _pygments_formatter = FluffyFormatter(
 
 _CONTENT_HEURISTICS = [
     (
-        [re.compile(
-            r'\b(?:SELECT\s+.+?\s+FROM|INSERT\s+INTO|CREATE\s+TABLE|UPDATE\s+.+?\s+SET|DELETE\s+FROM)\b',
-            re.IGNORECASE | re.DOTALL,
-        )],
+        [
+            re.compile(
+                r'\b(?:SELECT\s+.+?\s+FROM|INSERT\s+INTO|CREATE\s+TABLE|UPDATE\s+.+?\s+SET|DELETE\s+FROM)\b',
+                re.IGNORECASE | re.DOTALL,
+            ),
+        ],
         'sql',
     ),
     (
@@ -66,10 +68,12 @@ _CONTENT_HEURISTICS = [
         'json',
     ),
     (
-        [re.compile(
-            r'^\s*(?:<\?xml\b|<!DOCTYPE\b|<html[\s>]|<[a-z][a-z0-9]*[\s>])',
-            re.IGNORECASE,
-        )],
+        [
+            re.compile(
+                r'^\s*(?:<\?xml\b|<!DOCTYPE\b|<html[\s>]|<[a-z][a-z0-9]*[\s>])',
+                re.IGNORECASE,
+            ),
+        ],
         'html',
     ),
     (
