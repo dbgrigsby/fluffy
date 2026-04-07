@@ -317,19 +317,15 @@ def guess_lexer(text, language, filename, opts=None):
     try:
         lexer = pygments.lexers.guess_lexer(text, **lexer_opts)
 
-        if isinstance(lexer, pygments.lexers.TextLexer):
-            heuristic_lexer = _guess_from_text_heuristics(text, lexer_opts)
-            if heuristic_lexer is not None:
-                return heuristic_lexer
-
         # Newer versions of Pygments will virtually always fall back to
         # TextLexer due to its 0.01 priority (which is what it returns on
         # analyzing any text).
-        if not (
-            isinstance(lexer, pygments.lexers.TextLexer) or
-            # Seems to flag for everything in recent Pygments...
-            isinstance(lexer, pygments.lexers.ScdocLexer)
-        ):
+        # Seems to flag for everything in recent Pygments...
+        if isinstance(lexer, (pygments.lexers.TextLexer, pygments.lexers.ScdocLexer)):
+            heuristic_lexer = _guess_from_text_heuristics(text, lexer_opts)
+            if heuristic_lexer is not None:
+                return heuristic_lexer
+        else:
             return lexer
     except pygments.util.ClassNotFound:
         pass
