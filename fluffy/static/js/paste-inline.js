@@ -104,6 +104,77 @@ const lineNumbersFromClassList = (classList) => (
         .map(c => parseInt(c.substring(5)))
 );
 
+function lineIdsFromAnchorClassList(classList) {
+    return [...classList]
+        .filter((c) => c.startsWith('LL'))
+        .map((c) => parseInt(c.substring(2), 10))
+        .filter((n) => !Number.isNaN(n));
+}
+
+var pasteWrapResizeObserver = null;
+var pasteWrapSyncTimer = null;
+
+function syncPasteWrapLineHeights() {
+    if (!document.documentElement.classList.contains('paste-wrap-lines')) {
+        $('.line-numbers > a').css('min-height', '');
+        return;
+    }
+
+    $('.text-container').each(function() {
+        var $container = $(this);
+        $container.find('.line-numbers > a').each(function() {
+            var lineIds = lineIdsFromAnchorClassList(this.classList);
+            var total = 0;
+            for (var i = 0; i < lineIds.length; i++) {
+                var el = $container.find('.line-' + lineIds[i])[0];
+                if (el) {
+                    total += el.offsetHeight;
+                }
+            }
+            if (total > 0) {
+                this.style.minHeight = total + 'px';
+            } else {
+                this.style.minHeight = '';
+            }
+        });
+    });
+}
+
+function teardownPasteWrapResizeObserver() {
+    if (pasteWrapResizeObserver !== null) {
+        pasteWrapResizeObserver.disconnect();
+        pasteWrapResizeObserver = null;
+    }
+}
+
+function setupPasteWrapResizeObserver() {
+    teardownPasteWrapResizeObserver();
+    if (!document.documentElement.classList.contains('paste-wrap-lines')) {
+        return;
+    }
+    if (typeof ResizeObserver === 'undefined') {
+        return;
+    }
+    pasteWrapResizeObserver = new ResizeObserver(function() {
+        schedulePasteWrapSync();
+    });
+    document.querySelectorAll('#paste .text-container .text').forEach(function(el) {
+        pasteWrapResizeObserver.observe(el);
+    });
+}
+
+function schedulePasteWrapSync() {
+    if (pasteWrapSyncTimer !== null) {
+        clearTimeout(pasteWrapSyncTimer);
+    }
+    pasteWrapSyncTimer = setTimeout(function() {
+        pasteWrapSyncTimer = null;
+        syncPasteWrapLineHeights();
+    }, 50);
+}
+
+window.syncPasteWrapLineHeights = syncPasteWrapLineHeights;
+
 $(document).ready(function() {
     var numbers = $('.line-numbers > a');
     var setState = -1;
@@ -211,5 +282,33 @@ $(document).ready(function() {
 
     $('#style').change(function() {
         changeStyleTo($(this).val());
+        schedulePasteWrapSync();
+    });
+
+    if (document.documentElement.classList.contains('paste-wrap-lines')) {
+        syncPasteWrapLineHeights();
+        setupPasteWrapResizeObserver();
+    }
+
+    $(window).on('resize', schedulePasteWrapSync);
+
+    $(window).on('load', function() {
+        if (document.documentElement.classList.contains('paste-wrap-lines')) {
+            syncPasteWrapLineHeights();
+        }
+    });
+
+    var pasteWrapObserver = new MutationObserver(function() {
+        if (document.documentElement.classList.contains('paste-wrap-lines')) {
+            setupPasteWrapResizeObserver();
+            schedulePasteWrapSync();
+        } else {
+            teardownPasteWrapResizeObserver();
+            syncPasteWrapLineHeights();
+        }
+    });
+    pasteWrapObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
     });
 });
