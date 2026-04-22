@@ -122,11 +122,18 @@ function syncPasteWrapLineHeights() {
 
     $('.text-container').each(function() {
         var $container = $(this);
+        var lineElByNum = {};
+        $container.find('.text .highlight > pre > span').each(function() {
+            var m = (this.className || '').match(/\bline-(\d+)\b/);
+            if (m) {
+                lineElByNum[parseInt(m[1], 10)] = this;
+            }
+        });
         $container.find('.line-numbers > a').each(function() {
             var lineIds = lineIdsFromAnchorClassList(this.classList);
             var total = 0;
             for (var i = 0; i < lineIds.length; i++) {
-                var el = $container.find('.line-' + lineIds[i])[0];
+                var el = lineElByNum[lineIds[i]];
                 if (el) {
                     total += el.offsetHeight;
                 }
