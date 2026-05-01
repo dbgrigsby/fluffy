@@ -74,7 +74,7 @@
           var total = 0;
           for (var i = 0; i < lineIds.length; i++) {
             var el = lineElByNum[lineIds[i]];
-            if (el) { total += el.offsetHeight; }
+            if (el) { total += el.getBoundingClientRect().height; }
           }
           this.style.minHeight = total > 0 ? total + 'px' : '';
         });

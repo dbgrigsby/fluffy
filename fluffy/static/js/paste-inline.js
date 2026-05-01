@@ -135,7 +135,7 @@ function syncPasteWrapLineHeights() {
             for (var i = 0; i < lineIds.length; i++) {
                 var el = lineElByNum[lineIds[i]];
                 if (el) {
-                    total += el.offsetHeight;
+                    total += el.getBoundingClientRect().height;
                 }
             }
             if (total > 0) {
