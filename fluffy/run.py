@@ -66,6 +66,19 @@ def debug():  # pragma: no cover
             styles=STYLES_BY_CATEGORY,
         )
 
+    @app.route('/test/diff-long-lines')
+    def view_diff_long_lines():
+        text = (TESTING_DIR / 'files' / 'python-long-lines.diff').open().read()
+        highlighter = get_highlighter(text, None, None)
+        return render_template(
+            'paste.html',
+            texts=highlighter.prepare_text(text),
+            highlighter=highlighter,
+            edit_url='#edit',
+            raw_url='#raw',
+            styles=STYLES_BY_CATEGORY,
+        )
+
     @app.route('/test/ansi-color')
     def view_ansi_color():
         text = (TESTING_DIR / 'files' / 'ansi-color').open().read()
