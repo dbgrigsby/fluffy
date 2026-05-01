@@ -40,6 +40,19 @@ def debug():  # pragma: no cover
             styles=STYLES_BY_CATEGORY,
         )
 
+    @app.route('/test/paste-long-lines')
+    def view_paste_long_lines():
+        text = (TESTING_DIR / 'files' / 'code-long-lines.py').open().read()
+        highlighter = get_highlighter('', 'python', None)
+        return render_template(
+            'paste.html',
+            texts=highlighter.prepare_text(text),
+            highlighter=highlighter,
+            edit_url='#edit',
+            raw_url='#raw',
+            styles=STYLES_BY_CATEGORY,
+        )
+
     @app.route('/test/diff')
     def view_diff():
         text = (TESTING_DIR / 'files' / 'python.diff').open().read()
